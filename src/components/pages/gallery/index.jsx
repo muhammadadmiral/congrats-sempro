@@ -8,14 +8,16 @@ const Gallery = () => {
   }, []);
 
   return (
-    <div className="pt-16">
+    <div className="pt-16 md:pt-20">
       <PageHeader 
         title="Photo Gallery"
         subtitle="Capturing the memorable moments of academic achievement and celebration"
         bgColor="from-secondary-500 to-primary-500"
       />
       
-      <GalleryGrid />
+      <div className="px-2 md:px-4 py-4">
+        <GalleryGrid />
+      </div>
     </div>
   );
 };

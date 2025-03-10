@@ -92,6 +92,14 @@ const TestimonialSection = () => {
     }, 500);
   };
 
+  // Function to truncate text for mobile devices
+  const truncateText = (text, maxLength = 100) => {
+    if (!isMobile) return text;
+    
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+  };
+
   return (
     <section className="py-20 bg-gray-50 dark:bg-gray-900 relative overflow-hidden">
       {/* Background decorations */}
@@ -136,8 +144,32 @@ const TestimonialSection = () => {
             </>
           )}
           
+          {/* Mobile Navigation Buttons */}
+          {isMobile && (
+            <div className="flex justify-between mb-4">
+              <button 
+                className="w-10 h-10 rounded-full bg-white dark:bg-gray-800 shadow-md flex items-center justify-center text-gray-600 dark:text-gray-300"
+                onClick={goToPrev}
+                disabled={isAnimating}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button 
+                className="w-10 h-10 rounded-full bg-white dark:bg-gray-800 shadow-md flex items-center justify-center text-gray-600 dark:text-gray-300"
+                onClick={goToNext}
+                disabled={isAnimating}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          )}
+          
           {/* Testimonial Cards */}
-          <div className="relative min-h-[280px] md:min-h-[320px]">
+          <div className={`relative ${isMobile ? 'min-h-[350px]' : 'min-h-[280px] md:min-h-[320px]'}`}>
             {testimonials.map((testimonial, index) => (
               <motion.div
                 key={testimonial.id}
@@ -153,21 +185,38 @@ const TestimonialSection = () => {
                 }`}
               >
                 <div className="card-fancy dark:bg-gray-800 dark:border-gray-700 h-full flex flex-col justify-between p-0 overflow-hidden">
-                  <div className="p-6 md:p-8">
+                  <div className="p-4 md:p-6 lg:p-8 overflow-auto max-h-[200px] md:max-h-none">
                     <svg
-                      className="w-12 h-12 text-primary-200 dark:text-primary-800 mb-4"
+                      className="w-8 h-8 md:w-12 md:h-12 text-primary-200 dark:text-primary-800 mb-3 md:mb-4"
                       fill="currentColor"
                       viewBox="0 0 32 32"
                       aria-hidden="true"
                     >
                       <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z" />
                     </svg>
-                    <p className="text-xl text-gray-700 dark:text-gray-300 italic mb-6 elegant-quote">
-                      {testimonial.quote}
+                    <p className="text-base md:text-xl text-gray-700 dark:text-gray-300 italic mb-4 md:mb-6 elegant-quote">
+                      {isMobile ? (
+                        <>
+                          {truncateText(testimonial.quote)}
+                          {testimonial.quote.length > 100 && (
+                            <button 
+                              className="ml-1 text-primary-500 font-medium hover:underline"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                alert(testimonial.quote);
+                              }}
+                            >
+                              Baca Selengkapnya
+                            </button>
+                          )}
+                        </>
+                      ) : (
+                        testimonial.quote
+                      )}
                     </p>
                   </div>
-                  <div className="bg-gradient-to-r from-primary-500 to-secondary-500 p-6 flex items-center">
-                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-primary-600 font-bold overflow-hidden">
+                  <div className="bg-gradient-to-r from-primary-500 to-secondary-500 p-4 md:p-6 flex items-center">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center text-primary-600 font-bold overflow-hidden">
                       {testimonial.image ? (
                         <img
                           src={testimonial.image}
@@ -181,11 +230,11 @@ const TestimonialSection = () => {
                         testimonial.name.charAt(0)
                       )}
                     </div>
-                    <div className="ml-4 text-left">
-                      <h4 className="font-bold text-white">
+                    <div className="ml-3 md:ml-4 text-left">
+                      <h4 className="font-bold text-white text-sm md:text-base">
                         {testimonial.name}
                       </h4>
-                      <p className="text-white/80 text-sm">
+                      <p className="text-white/80 text-xs md:text-sm">
                         {testimonial.title}
                       </p>
                     </div>
@@ -196,14 +245,14 @@ const TestimonialSection = () => {
           </div>
 
           {/* Navigation Dots */}
-          <div className="flex justify-center mt-6">
+          <div className="flex justify-center mt-4 md:mt-6">
             {testimonials.map((_, index) => (
               <button
                 key={index}
                 onClick={() => handleDotClick(index)}
-                className={`w-3 h-3 mx-1 rounded-full transition-all duration-300 focus:outline-none ${
+                className={`w-2 h-2 md:w-3 md:h-3 mx-1 rounded-full transition-all duration-300 focus:outline-none ${
                   activeIndex === index
-                    ? "bg-primary-500 w-6"
+                    ? "bg-primary-500 w-4 md:w-6"
                     : "bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500"
                 }`}
                 aria-label={`Go to testimonial ${index + 1}`}

@@ -128,7 +128,7 @@ const Congratulations = () => {
   
   const handleWhatsAppRedirect = () => {
     const phoneNumber = "6281315481787"; // Ditambahkan kode negara (62 untuk Indonesia)
-    const message = encodeURIComponent("Hai miral");
+    const message = encodeURIComponent("hi miral, makasih ya hehe");
     window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
   };
   

@@ -1,10 +1,78 @@
 import { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
-import { FiMenu, FiX, FiHome, FiCamera, FiClock, FiMessageCircle, FiMoon, FiSun, FiMusic, FiVolumeX } from 'react-icons/fi';
+import { FiMenu, FiX, FiHome, FiCamera, FiClock, FiMessageCircle, FiMoon, FiSun, FiMusic, FiVolumeX, FiChevronRight } from 'react-icons/fi';
 import { useMusicPlayer } from '../shared/MusicPlayerContext';
 import { useIsMobile } from '../../hooks/useMediaQuery';
 
+// Audio Button Components
+// Audio Button Components - Optimized version
+const MusicToggleButton = ({ isMusicPlaying, isMusicAvailable, toggleMusic, darkMode, isMobile }) => {
+  if (!isMusicAvailable) return null;
+  
+  const handleToggleMusic = (e) => {
+    // Prevent default browser behavior
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Delay toggling to ensure event is handled completely
+    setTimeout(() => {
+      if (typeof toggleMusic === 'function') {
+        toggleMusic();
+      }
+    }, 100);
+    
+    return false;
+  };
+  
+  // Mobile version
+  if (isMobile) {
+    return (
+      <button
+        type="button"
+        onClick={handleToggleMusic}
+        className={`p-1.5 rounded-full transition-all duration-300 ${
+          darkMode 
+            ? 'bg-gray-700 text-primary-300' 
+            : 'bg-gray-100 text-primary-600'
+        }`}
+        aria-label={isMusicPlaying ? "Matikan Musik" : "Putar Musik"}
+      >
+        {isMusicPlaying ? (
+          <>
+            <FiMusic size={16} className="animate-pulse" />
+            <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-primary-500 rounded-full"></span>
+          </>
+        ) : (
+          <FiVolumeX size={16} />
+        )}
+      </button>
+    );
+  }
+  
+  // Desktop version
+  return (
+    <button
+      type="button"
+      onClick={handleToggleMusic}
+      className={`p-2 rounded-full transition-all duration-300 mr-2 relative ${
+        darkMode 
+          ? 'bg-gray-700 text-primary-300 hover:bg-gray-600' 
+          : 'bg-gray-100 text-primary-600 hover:bg-gray-200'
+      }`}
+      aria-label={isMusicPlaying ? "Matikan Musik" : "Putar Musik"}
+    >
+      {isMusicPlaying ? (
+        <>
+          <FiMusic size={18} className="animate-pulse" />
+          <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary-500 rounded-full"></span>
+        </>
+      ) : (
+        <FiVolumeX size={18} />
+      )}
+    </button>
+  );
+};
 const Navbar = () => {
   const { isMusicPlaying, toggleMusic, isMusicAvailable } = useMusicPlayer();
   const [isOpen, setIsOpen] = useState(false);
@@ -24,7 +92,6 @@ const Navbar = () => {
   
   // For scroll-based animations
   const { scrollY } = useScroll();
-  const navbarBgOpacity = useTransform(scrollY, [0, 50], [0, 1]);
   const logoScale = useTransform(scrollY, [0, 100], [1, 0.9]);
 
   // Close mobile menu when navigating to a new page
@@ -71,6 +138,17 @@ const Navbar = () => {
     }
   }, [isOpen, isMobile]);
 
+  // Force re-render on screen size change to fix disappearing navbar
+  useEffect(() => {
+    const handleResize = () => {
+      // Force update to rerender navbar
+      setIsOpen(false);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
   };
@@ -91,7 +169,7 @@ const Navbar = () => {
         key={path}
         to={path}
         className={({ isActive }) => `
-          flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all duration-300
+          flex items-center px-3 md:px-4 py-2 rounded-full text-sm font-medium transition-all duration-300
           ${isActive 
             ? 'bg-gradient-to-r from-primary-500 to-secondary-500 text-white shadow-md' 
             : darkMode
@@ -102,7 +180,7 @@ const Navbar = () => {
         onClick={() => setIsOpen(false)}
       >
         {icon}
-        {name}
+        <span className="whitespace-nowrap">{name}</span>
         
         {/* Dot indicator for the congratulations page */}
         {path === '/congratulations' && (
@@ -121,18 +199,13 @@ const Navbar = () => {
             ? 'bg-gray-800/95 backdrop-blur-md shadow-lg shadow-black/10' 
             : 'bg-white/95 backdrop-blur-md shadow-lg' 
           : location.pathname === '/' 
-            ? 'bg-transparent' 
+            ? darkMode 
+              ? 'bg-gray-900/30 backdrop-blur-sm' 
+              : 'bg-white/30 backdrop-blur-sm' 
             : darkMode 
               ? 'bg-gray-800/80 backdrop-blur-sm' 
               : 'bg-white/80 backdrop-blur-sm'
       }`}
-      style={{ 
-        backgroundColor: scrolled ? undefined : location.pathname === '/' 
-          ? 'transparent' 
-          : darkMode 
-            ? 'rgba(31, 41, 55, 0.8)' 
-            : 'rgba(255, 255, 255, 0.8)'
-      }}
     >
       {/* Animated bottom border */}
       <motion.div 
@@ -141,12 +214,12 @@ const Navbar = () => {
         transition={{ duration: 0.6 }}
       />
       
-      <div className="container mx-auto px-4 py-3">
+      <div className="container mx-auto px-3 sm:px-4 py-3">
         <div className="flex justify-between items-center">
           {/* Logo */}
           <NavLink to="/" className="flex items-center group z-10">
             <motion.div 
-              className="text-xl md:text-2xl font-display font-bold"
+              className="text-lg md:text-xl lg:text-2xl font-display font-bold"
               style={{ scale: logoScale }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -157,14 +230,14 @@ const Navbar = () => {
                     ? 'text-white' 
                     : 'text-primary-600' 
                   : location.pathname === '/' 
-                    ? 'text-white' 
+                    ? darkMode ? 'text-white' : 'text-primary-700'
                     : darkMode 
                       ? 'text-white' 
                       : 'text-primary-600'
               }`}>
                 Selamat
               </span>
-              <span className="fancy-gradient-text ml-2">Sempro</span>
+              <span className="fancy-gradient-text ml-1 md:ml-2">Sempro</span>
             </motion.div>
           </NavLink>
 
@@ -174,40 +247,16 @@ const Navbar = () => {
             
             <div className="h-8 w-px bg-gray-300 dark:bg-gray-700 mx-2"></div>
             
-            {/* Music Toggle Button */}
-            {!isCongratsPage && isMusicAvailable && (
-              <motion.button 
-                onClick={toggleMusic}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className={`p-2 rounded-full transition-all duration-300 mr-2 relative ${
-                  darkMode 
-                    ? 'bg-gray-700 text-primary-300 hover:bg-gray-600' 
-                    : 'bg-gray-100 text-primary-600 hover:bg-gray-200'
-                }`}
-                aria-label={isMusicPlaying ? "Mute Music" : "Play Music"}
-              >
-                {isMusicPlaying ? (
-                  <>
-                    <FiMusic size={18} className="animate-pulse" />
-                    <motion.span 
-                      className="absolute -top-1 -right-1 w-2 h-2 bg-primary-500 rounded-full"
-                      animate={{ 
-                        scale: [1, 1.5, 1],
-                        opacity: [1, 0.5, 1]
-                      }}
-                      transition={{
-                        duration: 1.5,
-                        repeat: Infinity,
-                        repeatType: "loop"
-                      }}
-                    />
-                  </>
-                ) : (
-                  <FiVolumeX size={18} />
-                )}
-              </motion.button>
-            )}
+           {/* Music Toggle Button - Desktop */}
+{(
+  <MusicToggleButton 
+    isMusicPlaying={isMusicPlaying}
+    isMusicAvailable={true} // Force true untuk testing
+    toggleMusic={toggleMusic}
+    darkMode={darkMode}
+    isMobile={false}
+  />
+)}
             
             {/* Dark Mode Toggle */}
             <motion.button 
@@ -227,57 +276,48 @@ const Navbar = () => {
 
           {/* Mobile Menu Controls */}
           <div className="md:hidden flex items-center space-x-2">
-            {/* Music Toggle (Mobile) */}
-            {!isCongratsPage && isMusicAvailable && (
-              <motion.button 
-                onClick={toggleMusic}
-                whileTap={{ scale: 0.9 }}
-                className={`p-2 rounded-full transition-all duration-300 ${
-                  darkMode 
-                    ? 'bg-gray-700 text-primary-300' 
-                    : 'bg-gray-100 text-primary-600'
-                }`}
-                aria-label={isMusicPlaying ? "Mute Music" : "Play Music"}
-              >
-                {isMusicPlaying ? (
-                  <FiMusic size={18} className="animate-pulse" />
-                ) : (
-                  <FiVolumeX size={18} />
-                )}
-              </motion.button>
-            )}
+           {/* Music Toggle Button - Mobile */}
+{!isCongratsPage && (
+  <MusicToggleButton 
+    isMusicPlaying={isMusicPlaying}
+    isMusicAvailable={true} // Force true untuk menampilkan tombol
+    toggleMusic={toggleMusic}
+    darkMode={darkMode}
+    isMobile={true}
+  />
+)}
             
             {/* Dark Mode Toggle (Mobile) */}
             <motion.button 
               onClick={toggleDarkMode}
               whileTap={{ scale: 0.9 }}
-              className={`p-2 rounded-full transition-all duration-300 ${
+              className={`p-1.5 rounded-full transition-all duration-300 ${
                 darkMode 
                   ? 'bg-gray-700 text-yellow-300' 
                   : 'bg-gray-100 text-gray-600'
               }`}
               aria-label={darkMode ? "Aktifkan Mode Terang" : "Aktifkan Mode Gelap"}
             >
-              {darkMode ? <FiSun size={18} /> : <FiMoon size={18} />}
+              {darkMode ? <FiSun size={16} /> : <FiMoon size={16} />}
             </motion.button>
             
-            {/* Menu Button */}
-            <motion.button
-              onClick={() => setIsOpen(!isOpen)}
-              whileTap={{ scale: 0.9 }}
-              aria-label={isOpen ? "Tutup menu" : "Buka menu"}
-              className={`p-2 rounded-full transition-all duration-300 ${
-                darkMode 
-                  ? 'bg-gray-700 text-white' 
-                  : 'bg-gray-100 text-gray-800'
-              }`}
-            >
-              {isOpen ? (
-                <FiX className="w-5 h-5" />
-              ) : (
-                <FiMenu className="w-5 h-5" />
-              )}
-            </motion.button>
+           {/* Menu Button */}
+<motion.button
+  onClick={() => setIsOpen(!isOpen)}
+  whileTap={{ scale: 0.9 }}
+  aria-label={isOpen ? "Tutup menu" : "Buka menu"}
+  className={`p-1.5 rounded-full transition-all duration-300 ${
+    darkMode 
+      ? 'bg-gray-700 text-white' 
+      : 'bg-gray-100 text-gray-800'
+  }`}
+>
+  {isOpen ? (
+    <FiX className="w-5 h-5" />
+  ) : (
+    <FiMenu className="w-5 h-5" />
+  )}
+</motion.button>
           </div>
         </div>
       </div>
@@ -287,15 +327,15 @@ const Navbar = () => {
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'calc(100vh - 70px)' }}
+            animate={{ opacity: 1, height: 'calc(100vh - 56px)' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className={`md:hidden fixed left-0 right-0 top-[70px] overflow-y-auto pb-6 ${
+            className={`md:hidden fixed left-0 right-0 top-[56px] overflow-y-auto pb-6 ${
               darkMode ? 'bg-gray-800' : 'bg-white'
             }`}
           >
-            <div className="container mx-auto px-4 py-4">
-              <div className="flex flex-col space-y-3">
+            <div className="container mx-auto px-4 py-2 md:py-4">
+              <div className="flex flex-col space-y-2">
                 {navLinks.map((link, index) => (
                   <motion.div
                     key={link.path}
@@ -306,7 +346,7 @@ const Navbar = () => {
                     <NavLink
                       to={link.path}
                       className={({ isActive }) => `
-                        flex items-center px-4 py-3 rounded-lg text-base font-medium transition-all duration-300
+                        flex items-center justify-between px-4 py-2.5 rounded-lg text-base font-medium transition-all duration-300
                         ${isActive 
                           ? 'bg-gradient-to-r from-primary-500 to-secondary-500 text-white' 
                           : darkMode
@@ -316,33 +356,36 @@ const Navbar = () => {
                       `}
                       onClick={() => setIsOpen(false)}
                     >
-                      {link.icon}
-                      {link.name}
-                      
-                      {link.path === '/congratulations' && (
-                        <span className="ml-2 w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                      )}
+                      <div className="flex items-center">
+                        {link.icon}
+                        {link.name}
+                        
+                        {link.path === '/congratulations' && (
+                          <span className="ml-2 w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                        )}
+                      </div>
+                      <FiChevronRight size={16} />
                     </NavLink>
                   </motion.div>
                 ))}
                 
-                <div className={`h-px w-full my-2 ${darkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
+                <div className={`h-px w-full my-1 ${darkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
                 
                 {/* Schedule Information */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
-                  className={`p-4 rounded-lg ${
+                  className={`p-3 rounded-lg ${
                     darkMode ? 'bg-gray-700/50' : 'bg-gray-100'
                   }`}
                 >
-                  <h3 className={`font-bold mb-3 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                  <h3 className={`font-bold mb-2 text-sm ${darkMode ? 'text-white' : 'text-gray-800'}`}>
                     Jadwal Penting
                   </h3>
                   
-                  <div className="space-y-2">
-                    <div className={`flex justify-between items-center text-sm ${
+                  <div className="space-y-1.5">
+                    <div className={`flex justify-between items-center text-xs ${
                       darkMode ? 'text-gray-300' : 'text-gray-600'
                     }`}>
                       <span>Seminar Proposal:</span>
@@ -350,7 +393,7 @@ const Navbar = () => {
                         Maret 2025
                       </span>
                     </div>
-                    <div className={`flex justify-between items-center text-sm ${
+                    <div className={`flex justify-between items-center text-xs ${
                       darkMode ? 'text-gray-300' : 'text-gray-600'
                     }`}>
                       <span>Seminar Hasil:</span>
@@ -358,7 +401,7 @@ const Navbar = () => {
                         Mei 2025
                       </span>
                     </div>
-                    <div className={`flex justify-between items-center text-sm ${
+                    <div className={`flex justify-between items-center text-xs ${
                       darkMode ? 'text-gray-300' : 'text-gray-600'
                     }`}>
                       <span>Ujian Komprehensif:</span>
@@ -374,23 +417,57 @@ const Navbar = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 }}
-                  className={`mt-4 p-4 rounded-lg text-center ${
+                  className={`mt-2 p-3 rounded-lg text-center ${
                     darkMode ? 'bg-gray-700/50' : 'bg-gray-100'
                   }`}
                 >
-                  <div className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  <div className={`text-xs ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                     <p className="mb-2">Kirim ucapan selamat:</p>
                     <button 
                       onClick={() => {
                         setIsOpen(false);
                         window.location.href = '/congratulations';
                       }}
-                      className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-4 py-2 rounded-full text-sm font-medium"
+                      className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-4 py-1.5 rounded-full text-xs font-medium"
                     >
                       Buka Halaman Ucapan
                     </button>
                   </div>
                 </motion.div>
+                
+                {/* Upcoming Events Section for Mobile */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                  className={`mt-2 p-3 rounded-lg ${
+                    darkMode ? 'bg-gray-700/50' : 'bg-gray-100'
+                  }`}
+                >
+                  <h3 className={`font-bold mb-2 text-sm ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                    Acara Mendatang
+                  </h3>
+                  
+                  <div className={`text-xs ${darkMode ? 'text-gray-300' : 'text-gray-600'} space-y-2`}>
+                    <div className="flex items-start">
+                      <div className="w-2 h-2 mt-1 rounded-full bg-primary-500 mr-2"></div>
+                      <div>
+                        <p className="font-medium">Seminar Hasil Penelitian</p>
+                        <p className="text-gray-400 dark:text-gray-500">15 Mei 2025, 09:00 WIB</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start">
+                      <div className="w-2 h-2 mt-1 rounded-full bg-secondary-500 mr-2"></div>
+                      <div>
+                        <p className="font-medium">Workshop Penulisan Skripsi</p>
+                        <p className="text-gray-400 dark:text-gray-500">5 April 2025, 13:00 WIB</p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+                
+              
               </div>
             </div>
           </motion.div>

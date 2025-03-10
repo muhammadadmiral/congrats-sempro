@@ -7,6 +7,7 @@ import Home from './components/pages/home';
 import Gallery from './components/pages/gallery';
 import Timeline from './components/pages/timeline';
 import Congratulations from './components/pages/congratulations';
+import Siap from './components/pages/Siap';
 
 // Create router with routes configuration
 const router = createBrowserRouter([
@@ -30,8 +31,13 @@ const router = createBrowserRouter([
       {
         path: 'congratulations',
         element: <Congratulations />,
-      }
+      },
     ],
+  },
+  {
+    path: '/hngg',
+    element: <Siap />,
+    errorElement: <ErrorPage />
   }
 ]);
 
