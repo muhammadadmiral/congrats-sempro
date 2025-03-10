@@ -13,7 +13,7 @@ export const galleryItems = [
       title: "Seminar Proposal Skripsi",
       category: "Akademik",
       description: "Presentasi proposal penelitian tentang adsorpsi nitrat menggunakan aluminium hidroksida dalam agarosa.",
-      imagePath: "/public/images/seminar-proposal.jpg", 
+      imagePath: "/public/images/jijah-sempro-1.jpg", 
       icon: "FiBook"
     },
     {
