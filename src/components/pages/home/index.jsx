@@ -4,10 +4,9 @@ import HeroSection from '../../../components/home/HeroSection';
 import FeatureCards from '../../../components/home/FeatureCards';
 import TestimonialSection from '../../home/TestimonialSections';
 import CallToAction from '../../../components/shared/CallToAction';
-
 const Home = () => {
   useEffect(() => {
-    document.title = 'Home - Congratulations Nur Fadiyah Azzizah';
+    document.title = 'Beranda - Selamat Seminar Proposal Nur Fadiyah Azzizah';
   }, []);
 
   return (
@@ -15,12 +14,15 @@ const Home = () => {
       {/* Hero Section */}
       <HeroSection />
       
+      {/* Thesis Info Section */}
+      <ThesisInfoSection />
+      
       {/* Features */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white dark:bg-gray-800">
         <div className="container mx-auto px-4">
-          <h2 className="section-title text-center" data-aos="fade-up">Achievements Journey</h2>
-          <p className="text-gray-600 text-center max-w-2xl mx-auto mb-12" data-aos="fade-up" data-aos-delay="100">
-            Explore the incredible journey and milestones achieved by Nur Fadiyah Azzizah on her academic path.
+          <h2 className="section-title text-center dark:text-white" data-aos="fade-up">Pencapaian Perjalanan</h2>
+          <p className="text-gray-600 dark:text-gray-300 text-center max-w-2xl mx-auto mb-12" data-aos="fade-up" data-aos-delay="100">
+            Jelajahi perjalanan luar biasa dan pencapaian yang diraih oleh Nur Fadiyah Azzizah dalam karir akademisnya.
           </p>
           
           <FeatureCards />
@@ -32,9 +34,9 @@ const Home = () => {
       
       {/* Call to Action */}
       <CallToAction 
-        title="Join the Celebration"
-        description="Add your congratulatory message and be part of this special moment."
-        buttonText="Send Wishes"
+        title="Bergabunglah dalam Perayaan"
+        description="Tambahkan pesan ucapan selamat Anda dan jadilah bagian dari momen spesial ini."
+        buttonText="Kirim Ucapan"
         buttonLink="/congratulations"
       />
     </div>

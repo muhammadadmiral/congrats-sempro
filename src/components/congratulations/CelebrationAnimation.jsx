@@ -78,8 +78,23 @@ const celebrationAnimationData = {
 
 const CelebrationAnimation = () => {
   const [showLottie, setShowLottie] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   
   useEffect(() => {
+    // Check for dark mode
+    const checkDarkMode = () => {
+      setIsDarkMode(document.documentElement.classList.contains('dark'));
+    };
+    
+    checkDarkMode();
+    
+    // Create an observer to watch for class changes on <html>
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, { 
+      attributes: true, 
+      attributeFilter: ['class'] 
+    });
+    
     // Create confetti effect on mount
     const duration = 5 * 1000;
     const animationEnd = Date.now() + duration;
@@ -93,14 +108,19 @@ const CelebrationAnimation = () => {
       
       const particleCount = 50 * (timeLeft / duration);
       
-      // Launch confetti from both sides
+      // Colors that work well in both light and dark mode
+      const colors = ['#0ea5e9', '#d946ef', '#f97316', '#22c55e', '#8b5cf6'];
+      
+      // Launch confetti from random positions
       confetti({
         particleCount,
         origin: { x: Math.random(), y: Math.random() - 0.2 },
-        colors: ['#0ea5e9', '#d946ef', '#f97316', '#22c55e', '#8b5cf6'],
+        colors: colors,
         gravity: 0.8,
         spread: 70,
-        ticks: 300
+        ticks: 300,
+        shapes: ['square', 'circle'],
+        scalar: Math.random() * 0.8 + 0.2
       });
     }, 250);
     
@@ -112,13 +132,15 @@ const CelebrationAnimation = () => {
     return () => {
       clearInterval(interval);
       clearTimeout(timer);
+      observer.disconnect();
     };
   }, []);
   
   return (
     <div className="absolute inset-0 pointer-events-none z-10 overflow-hidden">
-      {/* Floating stars */}
+      {/* Floating elements */}
       <div className="fixed inset-0">
+        {/* Floating stars */}
         {Array.from({ length: 10 }, (_, i) => (
           <motion.div
             key={i}
@@ -140,11 +162,47 @@ const CelebrationAnimation = () => {
               repeatType: "loop",
               delay: Math.random() * 5
             }}
-            className="absolute text-yellow-400 text-4xl"
+            className={`absolute text-4xl ${isDarkMode ? 'text-yellow-300' : 'text-yellow-400'}`}
           >
             ★
           </motion.div>
         ))}
+        
+        {/* Floating confetti pieces */}
+        {Array.from({ length: 15 }, (_, i) => {
+          const colors = ['text-primary-500', 'text-secondary-500', 'text-accent-500', 'text-purple-500', 'text-emerald-500'];
+          const shapes = ['■', '●', '▲', '◆', '✦'];
+          const size = Math.random() * 24 + 12;
+          
+          return (
+            <motion.div
+              key={`confetti-${i}`}
+              initial={{ 
+                x: Math.random() * window.innerWidth, 
+                y: -50,
+                scale: 0,
+                opacity: 0
+              }}
+              animate={{ 
+                y: window.innerHeight + 100,
+                scale: [0, 1],
+                opacity: [0, 0.7, 0],
+                rotate: Math.random() * 360 * (Math.random() > 0.5 ? 1 : -1)
+              }}
+              transition={{ 
+                duration: Math.random() * 8 + 4,
+                repeat: Infinity,
+                repeatType: "loop",
+                delay: Math.random() * 5,
+                ease: "easeInOut"
+              }}
+              className={`absolute ${colors[i % colors.length]} select-none`}
+              style={{ fontSize: `${size}px` }}
+            >
+              {shapes[i % shapes.length]}
+            </motion.div>
+          )
+        })}
       </div>
       
       {/* Center celebration animation */}
