@@ -25,14 +25,13 @@ const Congratulations = () => {
     {
       id: 3,
       name: "Adrian Agus",
-      role: "Co-Founder & CEO of PUYO Group",
+      role: "Co-Founder & CEO of PUYO Group (HAKA Dimsum)",
       message: "Ada masanya kita mencuri ruang dan waktu walau pasti berlalu, biarkan saja kita ke sana, selagi masih bisa bersama",
       timestamp: new Date('2025-03-08T09:45:00')
     },
     {
       id: 4,
-      name: "Miral Achmed",
-      role: "Teman Dekat",
+      name: "Miral",
       message: "cie dah sempro. keren dah luuu brooo. tapi masih ada jalan lagi yang harus di lewatin, semangat ya",
       timestamp: new Date('2025-03-07T10:30:00'),
       image: "/images/miral.jpg"
@@ -221,7 +220,7 @@ const Congratulations = () => {
     {
       id: 3,
       name: "Adrian Agus",
-      role: "Co-Founder & CEO of PUYO Group",
+      role: "Co-Founder & CEO of PUYO Group (HAKA Dimsum)",
       message: "Ada masanya kita mencuri ruang dan waktu walau pasti berlalu, biarkan saja kita ke sana, selagi masih bisa bersama",
       image: "/images/haka-dimsum.jpg",
       background: "bg-gradient-to-r from-red-500 to-orange-500",

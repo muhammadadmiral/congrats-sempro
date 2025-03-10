@@ -5,7 +5,7 @@ export const galleryItems = [
       title: "Kegiatan Laboratorium di BRIN",
       category: "Magang",
       description: "Praktikum dan penelitian di laboratorium Badan Riset dan Inovasi Nasional (BRIN) selama program magang.",
-      imagePath: "/gallery/lab-brin.jpg", // Foto laboratorium yang diunggah
+      imagePath: "/public/images/jijah-brin.jpg", // Foto laboratorium yang diunggah
       icon: "FiDroplet" // Mengganti dengan icon yang tersedia di Feather Icons
     },
     {
@@ -13,7 +13,7 @@ export const galleryItems = [
       title: "Seminar Proposal Skripsi",
       category: "Akademik",
       description: "Presentasi proposal penelitian tentang adsorpsi nitrat menggunakan aluminium hidroksida dalam agarosa.",
-      imagePath: "/gallery/placeholder-1.jpg", 
+      imagePath: "/public/images/seminar-proposal.jpg", 
       icon: "FiBook"
     },
     {
@@ -21,7 +21,7 @@ export const galleryItems = [
       title: "Medali Emas NASPO 2023",
       category: "Penghargaan",
       description: "Pencapaian medali emas dalam National Applied Science Project Olympiad (NASPO) 2023.",
-      imagePath: "/gallery/placeholder-3.jpg",
+      imagePath: "/public/images/naspo-2.jpg",
       icon: "FiAward"
     },
     {
@@ -29,7 +29,7 @@ export const galleryItems = [
       title: "Medali Emas NASPO 2022",
       category: "Penghargaan",
       description: "Pencapaian medali emas dalam National Applied Science Project Olympiad (NASPO) 2022.",
-      imagePath: "/gallery/placeholder-4.jpg",
+      imagePath: "/public/images/naspo-1.jpeg",
       icon: "FiAward"
     },
     {
@@ -37,7 +37,7 @@ export const galleryItems = [
       title: "Medali Emas YNFS 2022",
       category: "Penghargaan",
       description: "Pencapaian medali emas dalam Youth National Science Fair (YNFS) 2022.",
-      imagePath: "/gallery/placeholder-5.jpg",
+      imagePath: "/public/images/gold-medal-1.jpg",
       icon: "FiAward"
     },
     {
@@ -45,7 +45,7 @@ export const galleryItems = [
       title: "Aktivitas BEM FMIPA UB",
       category: "Organisasi",
       description: "Sebagai Staf Kementerian Sosial dan Lingkungan BEM FMIPA UB periode Februari-Desember 2023.",
-      imagePath: "/gallery/placeholder-6.jpg",
+      imagePath: "/public/images/school-1.jpg",
       icon: "FiUsers"
     },
     {
@@ -53,7 +53,7 @@ export const galleryItems = [
       title: "Sciencesaurus Competition",
       category: "Organisasi",
       description: "Berkontribusi sebagai staf divisi kompetisi dalam lomba essai dan poster tingkat nasional dengan 71 peserta.",
-      imagePath: "/gallery/placeholder-7.jpg",
+      imagePath: "/public/images/kim-hyeyoon-1.png",
       icon: "FiClipboard"
     },
     {
@@ -61,7 +61,7 @@ export const galleryItems = [
       title: "Relawan Pengajar Sahabat Abdi",
       category: "Volunteer",
       description: "Mengajar siswa kelas 6 SD di Karangploso, Malang dalam mata pelajaran tematik, seni, dan perayaan hari nasional.",
-      imagePath: "/gallery/placeholder-8.jpg",
+      imagePath: "/public/images/teaching-volunteer-1.jpg",
       icon: "FiHeart"
     },
     {
@@ -69,7 +69,7 @@ export const galleryItems = [
       title: "Praktikum Kimia Analitik",
       category: "Akademik",
       description: "Pengoperasian instrumen analitik seperti HPLC, Spektrofotometer UV-VIS, Turbidimeter, dan AAS untuk analisis kimia.",
-      imagePath: "/gallery/placeholder-9.jpg",
+      imagePath: "/public/images/lab-kimia-1.jpg",
       icon: "FiActivity"
     }
   ];

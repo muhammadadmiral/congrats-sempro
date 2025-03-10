@@ -4,6 +4,7 @@ import HeroSection from '../../../components/home/HeroSection';
 import FeatureCards from '../../../components/home/FeatureCards';
 import TestimonialSection from '../../home/TestimonialSections';
 import CallToAction from '../../../components/shared/CallToAction';
+import ThesisInfoSection from '../../home/ThesisInfoSection';
 const Home = () => {
   useEffect(() => {
     document.title = 'Beranda - Selamat Seminar Proposal Nur Fadiyah Azzizah';

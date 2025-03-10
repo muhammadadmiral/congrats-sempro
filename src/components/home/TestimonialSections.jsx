@@ -4,31 +4,31 @@ import { motion } from 'framer-motion';
 const testimonials = [
   {
     id: 1,
-    quote: "Proposal penelitian Nur sangat luar biasa, menunjukkan pemahaman mendalam tentang materi dan menawarkan solusi inovatif. Pendekatan metodologisnya sangat terstruktur dan terukur.",
-    name: "Prof. Dr. Ahmad Fauzi",
+    quote: "누르의 연구 제안서는 뛰어나며, 재료에 대한 깊은 이해를 보여주고 혁신적인 솔루션을 제공합니다. 방법론적 접근 방식은 매우 체계적이고 측정 가능합니다.",
+    name: "Prof. Dr. Hj. Lee Sung-Kyung",
     title: "Dosen Pembimbing",
-    image: "/testimonials/person1.jpg"
+    image: "/public/images/lee-sungkyung.jpeg"
   },
   {
     id: 2,
-    quote: "Kejelasan pemikiran dan ketelitian metodologi dalam proposalnya mengesankan seluruh komite. Kami menantikan hasil penelitian lengkapnya yang akan memberikan kontribusi signifikan di bidang kimia lingkungan.",
-    name: "Dr. Siti Rahma",
+    quote: "Ada masaaaaa nya kitaaaaaaaaaaaaaaaaaaaaaaa, Mencuri ruang dan waktuuuuuuuuuuuuuuuuu. Walauuu pastiii beeeerlalluuuu biaaaarrkan sajaaa kitaaa keeesanaaaaaaaa seeeelaaaagii maasih bisa bersamaaaa",
+    name: "Dr. Daniel Baskara Putra ",
     title: "Ketua Departemen",
-    image: "/testimonials/person2.jpg"
+    image: "/public/images/baskara.jpg"
   },
   {
     id: 3,
     quote: "Presentasi yang menonjol dengan efektivitas mengkomunikasikan ide-ide kompleks dengan percaya diri dan menjawab pertanyaan-pertanyaan menantang dengan sangat baik.",
-    name: "Dr. Budi Santoso",
-    title: "Anggota Penguji",
-    image: "/testimonials/person3.jpg"
+    name: "Budi Saksono, M.Sc., Ph.D.",
+    title: "Dosen Pembimbing BRIN",
+    image: "/public/images/pa-budi.jpg"
   },
   {
     id: 4,
-    quote: "Nur Fadiyah memiliki kemampuan analitis yang luar biasa. Penggunaan metode DGT untuk menganalisis nitrat menunjukkan penguasaannya pada teknik-teknik analisis modern dalam kimia lingkungan.",
-    name: "Dr. Rina Wijaya",
-    title: "Peneliti Senior BRIN",
-    image: "/testimonials/person4.jpg"
+    quote: "hehe",
+    name: "miral",
+    title: "gamtemk",
+    image: "/public/images/miral.jpg"
   }
 ];
 
