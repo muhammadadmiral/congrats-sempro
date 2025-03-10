@@ -1,13 +1,13 @@
 import { createBrowserRouter } from 'react-router-dom';
-import RootLayout from './components/layout/RootLayout';
+import RootLayout from './components/layout/RootLayou';
 import ErrorPage from './components/shared/ErrorPage';
 
 // Pages
-import Home from './pages/home';
-import Achievements from './pages/achievements';
-import Gallery from './pages/gallery';
-import Timeline from './pages/timeline';
-import Congratulations from './pages/congratulations';
+import Home from './components/pages/home';
+import Achievements from './components/pages/achievements';
+import Gallery from './components/pages/gallery';
+import Timeline from './components/pages/timeline';
+import Congratulations from './components/pages/congratulations';
 
 // Create router with routes configuration
 const router = createBrowserRouter([
