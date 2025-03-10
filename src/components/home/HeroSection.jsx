@@ -4,12 +4,15 @@ import { Link } from 'react-router-dom';
 import { FiChevronRight, FiCamera, FiCalendar, FiAward, FiHeart, FiStar, FiBookOpen, FiZap } from 'react-icons/fi';
 import confetti from 'canvas-confetti';
 import gsap from 'gsap';
+import { useIsMobile, useMediaQuery } from '../../hooks/useMediaQuery';
 
 const HeroSection = () => {
   const containerRef = useRef(null);
   const titleRef = useRef(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const isMobile = useIsMobile();
+  const isTablet = useMediaQuery('(min-width: 768px) and (max-width: 1023px)');
   
   // Check for dark mode
   useEffect(() => {
@@ -31,7 +34,7 @@ const HeroSection = () => {
   
   // Handle mouse move for 3D effect
   const handleMouseMove = (e) => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || isMobile) return;
     
     const rect = containerRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -58,12 +61,19 @@ const HeroSection = () => {
       });
     }
     
-    // Create confetti effect
+    // Create confetti effect with reduced intensity on mobile
     const duration = 5 * 1000;
     const animationEnd = Date.now() + duration;
     
     const randomInRange = (min, max) => {
       return Math.random() * (max - min) + min;
+    };
+    
+    // Reduce particle count on mobile for better performance
+    const getParticleCount = () => {
+      if (isMobile) return 15;
+      if (isTablet) return 30;
+      return 50;
     };
     
     const interval = setInterval(() => {
@@ -73,62 +83,68 @@ const HeroSection = () => {
         return clearInterval(interval);
       }
       
-      const particleCount = 50 * (timeLeft / duration);
+      const particleCount = getParticleCount() * (timeLeft / duration);
       
       // Launch confetti from both sides
       confetti({
         particleCount,
         origin: { x: randomInRange(0.1, 0.3), y: 0.5 },
         colors: ['#0ea5e9', '#d946ef', '#f97316', '#eab308', '#14b8a6'],
-        spread: 80,
+        spread: isMobile ? 50 : 80,
         gravity: 0.8,
-        scalar: 1.2,
-        ticks: 300,
-        shapes: ['square', 'circle']
+        scalar: isMobile ? 0.8 : 1.2,
+        ticks: isMobile ? 200 : 300,
+        shapes: ['square', 'circle'],
+        disableForReducedMotion: true // Accessibility improvement
       });
       
       confetti({
         particleCount,
         origin: { x: randomInRange(0.7, 0.9), y: 0.5 },
         colors: ['#0ea5e9', '#d946ef', '#f97316', '#eab308', '#14b8a6'],
-        spread: 80,
+        spread: isMobile ? 50 : 80,
         gravity: 0.8,
-        scalar: 1.2,
-        ticks: 300,
-        shapes: ['square', 'circle']
+        scalar: isMobile ? 0.8 : 1.2,
+        ticks: isMobile ? 200 : 300,
+        shapes: ['square', 'circle'],
+        disableForReducedMotion: true
       });
-    }, 250);
+    }, isMobile ? 500 : 250); // Reduced frequency on mobile
     
     return () => clearInterval(interval);
-  }, []);
+  }, [isMobile, isTablet]);
 
   return (
     <section 
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      className="relative min-h-screen flex items-center pt-20 pb-32 overflow-hidden bg-gradient-to-b from-gray-900/90 via-primary-900/80 to-gray-900/90 dark:from-gray-900 dark:via-primary-950 dark:to-gray-900 text-white"
+      className="relative min-h-screen flex items-center pt-20 pb-16 md:pb-32 overflow-hidden bg-gradient-to-b from-gray-900/90 via-primary-900/80 to-gray-900/90 dark:from-gray-900 dark:via-primary-950 dark:to-gray-900 text-white"
     >
-      {/* Radial gradients for depth */}
+      {/* Radial gradients for depth - optimized for mobile */}
       <div className="absolute inset-0 bg-gradient-radial from-primary-600/5 to-transparent dark:from-primary-500/10 dark:to-transparent"></div>
       
-      {/* Animated Background Shapes */}
-      <div className="absolute top-20 right-10 w-64 h-64 rounded-full bg-secondary-500/20 blur-3xl animate-float"></div>
-      <div className="absolute bottom-20 left-10 w-72 h-72 rounded-full bg-primary-500/10 blur-3xl animate-float animation-delay-1000"></div>
-      <div className="absolute top-1/2 left-1/4 w-40 h-40 rounded-full bg-accent-500/10 blur-3xl animate-float animation-delay-2000"></div>
+      {/* Animated Background Shapes - fewer on mobile */}
+      <div className="absolute top-20 right-10 w-40 md:w-64 h-40 md:h-64 rounded-full bg-secondary-500/20 blur-3xl animate-float"></div>
+      <div className="absolute bottom-20 left-10 w-48 md:w-72 h-48 md:h-72 rounded-full bg-primary-500/10 blur-3xl animate-float animation-delay-1000"></div>
+      {!isMobile && (
+        <div className="absolute top-1/2 left-1/4 w-40 h-40 rounded-full bg-accent-500/10 blur-3xl animate-float animation-delay-2000"></div>
+      )}
       
-      {/* Particle effects */}
+      {/* Particle effects - fewer on mobile */}
       <div className="absolute inset-0 pointer-events-none">
-        {Array.from({ length: 20 }).map((_, i) => (
+        {Array.from({ length: isMobile ? 10 : 20 }).map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 rounded-full bg-white/30"
+            className="absolute bg-white/30 rounded-full"
             style={{
+              width: Math.random() * 6 + 2,
+              height: Math.random() * 6 + 2,
               top: `${Math.random() * 100}%`,
               left: `${Math.random() * 100}%`,
             }}
             animate={{
+              y: [0, -30, 0],
               opacity: [0.1, 0.5, 0.1],
-              scale: [1, 1.5, 1],
             }}
             transition={{
               duration: Math.random() * 3 + 2,
@@ -140,39 +156,43 @@ const HeroSection = () => {
         ))}
       </div>
       
-      {/* Floating Shapes */}
-      <motion.div
-        className="absolute top-32 right-1/4 w-8 h-8 rotate-45 bg-primary-400/20 rounded-lg"
-        animate={{
-          y: [0, -20, 0],
-          rotate: [45, 90, 45],
-          opacity: [0.3, 0.5, 0.3]
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      />
+      {/* Floating Shapes - fewer on mobile */}
+      {!isMobile && (
+        <>
+          <motion.div
+            className="absolute top-32 right-1/4 w-8 h-8 rotate-45 bg-primary-400/20 rounded-lg"
+            animate={{
+              y: [0, -20, 0],
+              rotate: [45, 90, 45],
+              opacity: [0.3, 0.5, 0.3]
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          
+          <motion.div
+            className="absolute bottom-40 left-1/3 w-6 h-6 bg-secondary-400/20 rounded-full"
+            animate={{
+              y: [0, -15, 0],
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.6, 0.3]
+            }}
+            transition={{
+              duration: 5,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </>
+      )}
       
       <motion.div
-        className="absolute bottom-40 left-1/3 w-6 h-6 bg-secondary-400/20 rounded-full"
+        className="absolute top-60 left-20 w-8 md:w-10 h-8 md:h-10 bg-accent-400/20 rotate-12 rounded-lg"
         animate={{
           y: [0, -15, 0],
-          scale: [1, 1.2, 1],
-          opacity: [0.3, 0.6, 0.3]
-        }}
-        transition={{
-          duration: 5,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      />
-      
-      <motion.div
-        className="absolute top-60 left-20 w-10 h-10 bg-accent-400/20 rotate-12 rounded-lg"
-        animate={{
-          y: [0, -25, 0],
           rotate: [12, -12, 12],
           opacity: [0.3, 0.5, 0.3]
         }}
@@ -193,18 +213,18 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.8 }}
-          className="absolute -top-10 left-1/2 transform -translate-x-1/2 w-full max-w-2xl"
+          className="absolute -top-10 left-1/2 transform -translate-x-1/2 w-full max-w-md md:max-w-2xl"
         >
-          <div className="bg-gradient-to-r from-primary-900/80 via-primary-800/90 to-primary-900/80 backdrop-blur-md shadow-lg border border-primary-700/50 rounded-full py-2 px-6 flex items-center justify-center">
-            <div className="flex items-center space-x-2 text-primary-300">
+          <div className="bg-gradient-to-r from-primary-900/80 via-primary-800/90 to-primary-900/80 backdrop-blur-md shadow-lg border border-primary-700/50 rounded-full py-2 px-4 md:px-6 flex items-center justify-center">
+            <div className="flex items-center space-x-2 text-primary-300 text-xs md:text-sm">
               <FiStar className="animate-pulse" />
-              <span className="text-sm font-medium">Seminar Proposal • Maret 2025</span>
+              <span className="font-medium">Seminar Proposal • Maret 2025</span>
               <FiStar className="animate-pulse" />
             </div>
           </div>
         </motion.div>
         
-        <div className="grid md:grid-cols-2 gap-12 items-center">
+        <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
           {/* Text Content */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -219,23 +239,23 @@ const HeroSection = () => {
               className="inline-flex items-center mb-6 px-4 py-2 rounded-full bg-gradient-to-r from-primary-700/70 to-secondary-700/70 text-white backdrop-blur-sm border border-white/10 shadow-lg"
             >
               <FiAward className="mr-2 text-yellow-400" />
-              <span>Academic Excellence</span>
+              <span className="text-sm">Academic Excellence</span>
             </motion.div>
             
             <div ref={titleRef} className="overflow-hidden">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-bold leading-tight mb-3 text-white">
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold leading-tight mb-3 text-white">
                 <span className="block mb-2 text-gradient-animated">Nur Fadiyah Azzizah</span>
-                <span className="text-xl md:text-2xl lg:text-3xl text-secondary-300 block mt-2 font-semibold">aka Jijah</span>
+                <span className="text-lg md:text-2xl lg:text-3xl text-secondary-300 block mt-2 font-semibold">aka Jijah</span>
               </h1>
               
-              <div className="w-24 h-1 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full mb-6 md:mx-0 mx-auto"></div>
+              <div className="w-24 h-1 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full mb-6 mx-auto md:mx-0"></div>
             </div>
             
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="text-gray-300 text-lg md:text-xl mb-8 max-w-xl leading-relaxed"
+              className="text-gray-300 text-base md:text-lg lg:text-xl mb-8 max-w-xl leading-relaxed"
             >
               Berhasil menjadi orang keren yang menyelesaikan seminar proposal yang sulitttttttt iniiiii walaupun sambil ya Allah ya Allah
             </motion.p>
@@ -244,16 +264,16 @@ const HeroSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="flex flex-wrap gap-4 justify-center md:justify-start"
+              className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start"
             >
               <Link to="/gallery">
                 <motion.button
                   whileHover={{ scale: 1.05, boxShadow: "0 0 15px rgba(14, 165, 233, 0.5)" }}
                   whileTap={{ scale: 0.95 }}
-                  className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-full font-bold flex items-center space-x-2 shadow-lg shadow-primary-900/30 border border-primary-500/30 group hover:border-primary-400/50 transition-all duration-300"
+                  className="w-full sm:w-auto bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-full font-bold flex items-center space-x-2 shadow-lg shadow-primary-900/30 border border-primary-500/30 group hover:border-primary-400/50 transition-all duration-300"
                 >
                   <FiCamera className="mr-2 group-hover:animate-pulse" />
-                  <span>futunaaa</span>
+                  <span>Lihat Galeri</span>
                   <FiChevronRight className="ml-1 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-1" />
                 </motion.button>
               </Link>
@@ -262,43 +282,21 @@ const HeroSection = () => {
                 <motion.button
                   whileHover={{ scale: 1.05, boxShadow: "0 0 15px rgba(217, 70, 239, 0.3)" }}
                   whileTap={{ scale: 0.95 }}
-                  className="bg-transparent border border-secondary-500/50 text-white px-6 py-3 rounded-full font-bold flex items-center space-x-2 hover:bg-secondary-900/30 transition-all duration-300 group"
+                  className="w-full sm:w-auto bg-transparent border border-secondary-500/50 text-white px-6 py-3 rounded-full font-bold flex items-center space-x-2 hover:bg-secondary-900/30 transition-all duration-300 group"
                 >
                   <FiCalendar className="mr-2 group-hover:animate-pulse text-secondary-300" />
-                  <span>Intip Perjalanan Waktu!</span>                  
+                  <span>Perjalanan</span>                  
                   <FiChevronRight className="ml-1 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-1" />
                 </motion.button>
               </Link>
             </motion.div>
             
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 1 }}
-              className="mt-12 flex items-center justify-center md:justify-start"
-            >
-              <div className="relative">
-                <div className="flex -space-x-3">
-                  <div className="w-10 h-10 rounded-full bg-primary-500 flex items-center justify-center text-white font-bold border-2 border-gray-900 shadow-lg shadow-primary-900/50 z-30">P</div>
-                  <div className="w-10 h-10 rounded-full bg-secondary-500 flex items-center justify-center text-white font-bold border-2 border-gray-900 shadow-lg shadow-secondary-900/50 z-20">D</div>
-                  <div className="w-10 h-10 rounded-full bg-accent-500 flex items-center justify-center text-white font-bold border-2 border-gray-900 shadow-lg shadow-accent-900/50 z-10">R</div>
-                </div>
-                
-                {/* Pulsing circle behind avatars */}
-                <div className="absolute inset-0 rounded-full bg-white/5 blur-md animate-pulse -z-10 scale-125"></div>
-              </div>
-              
-              <div className="ml-4">
-                <p className="text-sm text-gray-300">Gabung bersama <span className="text-primary-400 font-semibold">48+</span> aktor kdrama yang mengucapkan chughahabnida</p>
-              </div>
-            </motion.div>
-            
-            {/* Achievement badges */}
+            {/* Achievement badges - hide on smallest screens */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 1.2 }}
-              className="mt-8 flex flex-wrap gap-2 justify-center md:justify-start"
+              className="mt-8 hidden sm:flex flex-wrap gap-2 justify-center md:justify-start"
             >
               <span className="px-3 py-1 rounded-full text-xs font-medium bg-primary-900/70 text-primary-300 border border-primary-700/50">NASPO 2023</span>
               <span className="px-3 py-1 rounded-full text-xs font-medium bg-secondary-900/70 text-secondary-300 border border-secondary-700/50">BEM FMIPA UB</span>
@@ -313,14 +311,14 @@ const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             style={{
-              transform: `perspective(1000px) rotateX(${-mousePosition.y}deg) rotateY(${mousePosition.x}deg)`,
+              transform: isMobile ? undefined : `perspective(1000px) rotateX(${-mousePosition.y}deg) rotateY(${mousePosition.x}deg)`,
               transformStyle: "preserve-3d"
             }}
-            className="flex justify-center"
+            className="flex justify-center mt-6 md:mt-0"
           >
             <div className="relative card-3d">
               {/* Main photo container with fancy border */}
-              <div className="relative w-80 h-80 md:w-96 md:h-96 overflow-hidden rounded-full p-1 shadow-xl bg-gradient-to-br from-primary-500 via-secondary-500 to-accent-400 animate-shine bg-size-200">
+              <div className={`relative w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-96 lg:h-96 overflow-hidden rounded-full p-1 shadow-xl bg-gradient-to-br from-primary-500 via-secondary-500 to-accent-400 animate-shine bg-size-200`}>
                 <div className="w-full h-full rounded-full flex items-center justify-center overflow-hidden bg-gray-900 p-1">
                   {/* Actual photo */}
                   <div className="w-full h-full rounded-full overflow-hidden relative group">
@@ -328,6 +326,7 @@ const HeroSection = () => {
                       src="/images/jijah-1.jpg" 
                       alt="Nur Fadiyah Azzizah aka Jijah" 
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      loading="eager" // Ensure priority loading
                       onError={(e) => {
                         e.target.onerror = null;
                         e.target.src = ""; 
@@ -345,45 +344,66 @@ const HeroSection = () => {
                 <div className="absolute -inset-4 rounded-full animate-spin-slow opacity-30 bg-transparent border border-dashed border-white/10" style={{ animationDirection: 'reverse', animationDuration: '30s' }}></div>
               </div>
               
-              {/* Floating elements with enhanced depth and styling */}
-              <motion.div 
-                className="absolute -top-8 -right-8 bg-gradient-to-br from-accent-500 to-accent-600 w-24 h-24 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-accent-900/50 backdrop-blur-sm border border-accent-400/30"
-                animate={{
-                  y: [0, -10, 0],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  repeatType: "loop"
-                }}
-                style={{ 
-                  transform: `translateZ(40px) rotateX(${mousePosition.y * 0.2}deg) rotateY(${-mousePosition.x * 0.2}deg)` 
-                }}
-              >
-                <FiZap className="absolute -top-2 -right-2 text-yellow-300 text-xl animate-pulse" />
-                <span>2025</span>
-              </motion.div>
+              {/* Floating elements - simplified for mobile */}
+              {!isMobile && (
+                <>
+                  <motion.div 
+                    className="absolute -top-8 -right-8 bg-gradient-to-br from-accent-500 to-accent-600 w-20 md:w-24 h-20 md:h-24 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-accent-900/50 backdrop-blur-sm border border-accent-400/30"
+                    animate={{
+                      y: [0, -10, 0],
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      repeatType: "loop"
+                    }}
+                    style={{ 
+                      transform: `translateZ(40px) rotateX(${mousePosition.y * 0.2}deg) rotateY(${-mousePosition.x * 0.2}deg)` 
+                    }}
+                  >
+                    <FiZap className="absolute -top-2 -right-2 text-yellow-300 text-xl animate-pulse" />
+                    <span>2025</span>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="absolute -bottom-6 -left-6 bg-gradient-to-br from-gray-900/90 to-primary-900/90 p-4 rounded-xl shadow-xl border border-primary-700/50 backdrop-blur-sm"
+                    animate={{
+                      y: [0, 5, 0],
+                    }}
+                    transition={{
+                      duration: 4,
+                      repeat: Infinity,
+                      repeatType: "loop"
+                    }}
+                    style={{ 
+                      transform: `translateZ(60px) rotateX(${mousePosition.y * 0.3}deg) rotateY(${-mousePosition.x * 0.3}deg)` 
+                    }}
+                  >
+                    <div className="text-sm font-medium text-primary-300 mb-1">Sempro</div>
+                    <div className="text-lg font-bold text-white">Berhasil!</div>
+                  </motion.div>
+                </>
+              )}
               
-              <motion.div 
-                className="absolute -bottom-6 -left-6 bg-gradient-to-br from-gray-900/90 to-primary-900/90 p-5 rounded-xl shadow-xl border border-primary-700/50 backdrop-blur-sm"
-                animate={{
-                  y: [0, 5, 0],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  repeatType: "loop"
-                }}
-                style={{ 
-                  transform: `translateZ(60px) rotateX(${mousePosition.y * 0.3}deg) rotateY(${-mousePosition.x * 0.3}deg)` 
-                }}
-              >
-                <div className="text-sm font-medium text-primary-300 mb-1">Sempro</div>
-                <div className="text-lg font-bold text-white">Berhasil di bantai!</div>
-              </motion.div>
+              {/* Simplified mobile floating elements */}
+              {isMobile && (
+                <motion.div 
+                  className="absolute -top-4 -right-4 bg-gradient-to-br from-accent-500 to-accent-600 w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-accent-900/50 backdrop-blur-sm border border-accent-400/30"
+                  animate={{
+                    y: [0, -5, 0],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    repeatType: "loop"
+                  }}
+                >
+                  <span>2025</span>
+                </motion.div>
+              )}
               
               <motion.div
-                className="absolute top-1/2 -right-12 transform -translate-y-1/2 bg-gradient-to-r from-gray-900/80 to-primary-900/80 px-4 py-2 rounded-full shadow-lg border border-primary-700/30 backdrop-blur-sm flex items-center"
+                className={`absolute ${isMobile ? 'top-1/2 -right-4' : 'top-1/2 -right-12'} transform -translate-y-1/2 bg-gradient-to-r from-gray-900/80 to-primary-900/80 px-2 sm:px-4 py-1 sm:py-2 rounded-full shadow-lg border border-primary-700/30 backdrop-blur-sm flex items-center`}
                 animate={{
                   x: [0, 5, 0],
                 }}
@@ -392,83 +412,48 @@ const HeroSection = () => {
                   repeat: Infinity,
                   repeatType: "loop"
                 }}
-                style={{ 
+                style={!isMobile ? { 
                   transform: `translateZ(30px) rotateY(${-mousePosition.x * 0.2}deg)` 
-                }}
+                } : undefined}
               >
                 <FiHeart className="text-red-500 mr-1 animate-heartbeat" />
-                <span className="text-sm font-medium text-white">Excellence</span>
-              </motion.div>
-              
-              <motion.div
-                className="absolute top-1/4 -left-12 transform -translate-y-1/2 bg-gradient-to-r from-secondary-600 to-primary-600 px-3 py-1 rounded-lg shadow-lg text-white text-xs font-bold"
-                animate={{
-                  x: [0, -5, 0],
-                }}
-                transition={{
-                  duration: 3.5,
-                  repeat: Infinity,
-                  repeatType: "loop"
-                }}
-                style={{ 
-                  transform: `translateZ(50px) rotateY(${-mousePosition.x * 0.4}deg)` 
-                }}
-              >
-                <FiBookOpen className="inline-block mr-1" />
-                <span>GPA 99.99999</span>
-              </motion.div>
-              
-              {/* Extra floating element */}
-              <motion.div
-                className="absolute bottom-1/4 -right-10 transform -translate-y-1/2 bg-gradient-to-r from-purple-600/90 to-blue-600/90 px-3 py-1 rounded-lg shadow-lg text-white text-xs font-bold backdrop-blur-sm border border-purple-500/30"
-                animate={{
-                  y: [0, 8, 0],
-                  rotate: [0, 5, 0],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  repeatType: "loop"
-                }}
-                style={{ 
-                  transform: `translateZ(45px) rotateY(${-mousePosition.x * 0.3}deg)` 
-                }}
-              >
-                <span>Kimia Lingkungan</span>
+                <span className="text-xs md:text-sm font-medium text-white">Excellence</span>
               </motion.div>
             </div>
           </motion.div>
         </div>
         
-        {/* Scroll indicator with enhanced styling */}
-        <motion.div 
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-          animate={{
-            y: [0, 10, 0],
-          }}
-          transition={{
-            duration: 1.5,
-            repeat: Infinity,
-            repeatType: "loop"
-          }}
-        >
-          <div className="flex flex-col items-center">
-            <span className="text-xs text-gray-400 mb-2">Scroll down</span>
-            <div className="w-6 h-10 border border-primary-500/50 rounded-full flex items-center justify-center p-1">
-              <motion.div 
-                className="w-1.5 h-1.5 bg-primary-400 rounded-full"
-                animate={{
-                  y: [0, 12, 0]
-                }}
-                transition={{
-                  duration: 1.5,
-                  repeat: Infinity,
-                  repeatType: "loop"
-                }}
-              />
+        {/* Scroll indicator - hide on mobile */}
+        {!isMobile && (
+          <motion.div 
+            className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+            animate={{
+              y: [0, 10, 0],
+            }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              repeatType: "loop"
+            }}
+          >
+            <div className="flex flex-col items-center">
+              <span className="text-xs text-gray-400 mb-2">Scroll down</span>
+              <div className="w-6 h-10 border border-primary-500/50 rounded-full flex items-center justify-center p-1">
+                <motion.div 
+                  className="w-1.5 h-1.5 bg-primary-400 rounded-full"
+                  animate={{
+                    y: [0, 12, 0]
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    repeatType: "loop"
+                  }}
+                />
+              </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        )}
       </div>
     </section>
   );
