@@ -15,6 +15,9 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
       },
+      output: {
+        manualChunks: undefined,
+      },
     },
   },
   // Ensure public directory is correctly processed
@@ -25,4 +28,18 @@ export default defineConfig({
       '@': resolve(__dirname, 'src'),
     },
   },
+  // Add favicon replacement logic
+  experimental: {
+    renderBuiltUrl(filename, { hostType }) {
+      if (filename === 'vite.svg') {
+        return '/jijah-16.png';
+      }
+      return filename;
+    }
+  },
+  server: {
+    watch: {
+      usePolling: true
+    }
+  }
 })
