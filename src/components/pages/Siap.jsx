@@ -42,7 +42,11 @@ const Siap = () => {
   };
   
   const handleFinalConfirm = () => {
-    // Now navigate to home - with replace option to fix routing issues
+    // Make sure the hasVisitedBefore flag is set in sessionStorage
+    sessionStorage.setItem('hasVisitedBefore', 'true');
+    
+    // Navigate to home and replace the current entry in history
+    // This ensures we don't go back to the loading screen
     navigate('/', { replace: true });
   };
 

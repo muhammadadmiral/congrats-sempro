@@ -14,7 +14,6 @@ export default function RootLayout() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [showInitialButton, setShowInitialButton] = useState(false);
-
   useEffect(() => {
     // Initialize AOS library with responsive settings
     AOS.init({
@@ -29,13 +28,20 @@ export default function RootLayout() {
       AOS.refresh();
     });
 
-    // Simulate loading for a smoother experience
-    const timer = setTimeout(() => {
-      setShowInitialButton(true);
-    }, 1200);
+    // Check if we've already visited the site to skip the loading screen
+    const hasVisited = sessionStorage.getItem('hasVisitedBefore');
+    if (hasVisited) {
+      setIsLoading(false);
+    } else {
+      // Simulate loading for a smoother experience
+      const timer = setTimeout(() => {
+        setShowInitialButton(true);
+      }, 1200);
+      
+      return () => clearTimeout(timer);
+    }
 
     return () => {
-      clearTimeout(timer);
       window.removeEventListener('resize', () => {
         AOS.refresh();
       });
