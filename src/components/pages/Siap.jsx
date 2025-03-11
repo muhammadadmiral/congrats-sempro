@@ -12,8 +12,8 @@ const Siap = () => {
   const [showHeartAnimation, setShowHeartAnimation] = useState(false);
   const mainContainerRef = useRef(null);
 
-  // Array of stickers to show in background (bigger)
-  const backgroundStickers = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+  // Optimize stickers for mobile
+  const backgroundStickers = [2, 3, 4, 5, 6, 7, 8]; // Reduced number for better performance
   
   useEffect(() => {
     document.title = '✨ Siap? - Congratulations Nur Fadiyah Azzizah';
@@ -22,6 +22,16 @@ const Siap = () => {
     const timer = setTimeout(() => {
       setAnimationComplete(true);
     }, 1500);
+    
+    // Preload sticker images for better mobile performance
+    const preloadImages = () => {
+      backgroundStickers.forEach(sticker => {
+        const img = new Image();
+        img.src = `/stickers/jijah-${sticker}.png`;
+      });
+    };
+    
+    preloadImages();
     
     return () => clearTimeout(timer);
   }, []);
@@ -72,15 +82,15 @@ const Siap = () => {
   };
 
   const floatingIconVariants = {
-    animate: {
-      y: [0, -15, 0],
-      rotate: [0, 5, 0, -5, 0],
+    animate: (isMobileDevice) => ({
+      y: [0, isMobileDevice ? -5 : -15, 0],
+      rotate: [0, isMobileDevice ? 3 : 5, 0, isMobileDevice ? -3 : -5, 0],
       transition: {
-        duration: 3,
+        duration: isMobileDevice ? 2 : 3,
         repeat: Infinity,
         repeatType: "loop"
       }
-    }
+    })
   };
   
   const stickerFloatVariants = {
@@ -99,17 +109,22 @@ const Siap = () => {
         damping: 20
       }
     },
-    float: (index) => ({
-      y: [0, -25, 0],
-      x: [0, index % 2 === 0 ? 15 : -15, 0],
-      rotate: [0, index % 2 === 0 ? 10 : -10, 0],
-      transition: {
-        duration: 5 + (index % 3) * 2,
-        repeat: Infinity,
-        repeatType: "mirror",
-        ease: "easeInOut"
-      }
-    })
+    float: (index) => {
+      // Reduced animation for mobile devices
+      const isMobileDevice = window.innerWidth < 768;
+      
+      return {
+        y: [0, isMobileDevice ? -10 : -25, 0],
+        x: [0, isMobileDevice ? (index % 2 === 0 ? 5 : -5) : (index % 2 === 0 ? 15 : -15), 0],
+        rotate: [0, isMobileDevice ? (index % 2 === 0 ? 5 : -5) : (index % 2 === 0 ? 10 : -10), 0],
+        transition: {
+          duration: isMobileDevice ? 3 + (index % 2) : 5 + (index % 3) * 2,
+          repeat: Infinity,
+          repeatType: "mirror",
+          ease: "easeInOut"
+        }
+      };
+    }
   };
 
   const buttonVariants = {
@@ -165,8 +180,28 @@ const Siap = () => {
     }
   };
 
-  // Generate random positions for stickers
+  // Function to check if running on mobile
+  const isMobile = () => {
+    return window.innerWidth < 768;
+  };
+
+  // Generate optimized random positions for stickers
   const getRandomPosition = (index) => {
+    // Simplified positions for mobile to ensure visibility
+    if (isMobile()) {
+      const mobilePositions = [
+        { top: '10%', left: '10%' },
+        { top: '15%', right: '5%' },
+        { bottom: '30%', left: '5%' },
+        { bottom: '15%', right: '10%' },
+        { top: '50%', left: '15%' },
+        { top: '40%', right: '10%' },
+        { bottom: '50%', right: '5%' },
+      ];
+      return mobilePositions[index % mobilePositions.length];
+    }
+    
+    // Desktop positions
     const positions = [
       { top: '5%', left: '10%' },
       { top: '15%', right: '15%' },
@@ -189,8 +224,9 @@ const Siap = () => {
   };
 
   return (
-    <div className="min-h-screen py-16 px-4 bg-gradient-to-br from-primary-50 to-secondary-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center relative overflow-hidden">
-      {/* Floating hearts animation */}
+    <div className="min-h-screen py-8 sm:py-12 md:py-16 px-3 sm:px-4 bg-gradient-to-br from-primary-50 to-secondary-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center relative overflow-hidden"
+         style={{ overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }}>
+      {/* Ensure this div doesn't overflow the screen */}
       {showHeartAnimation && (
         <motion.div 
           className="fixed inset-0 z-50 pointer-events-none"
@@ -199,7 +235,7 @@ const Siap = () => {
           animate="animate"
         >
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-            <FiHeart className="text-red-500 w-40 h-40 md:w-60 md:h-60" />
+            <FiHeart className="text-red-500 w-28 h-28 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-60 lg:h-60" />
           </div>
         </motion.div>
       )}
@@ -219,39 +255,49 @@ const Siap = () => {
             <motion.img
               src={`/stickers/jijah-${sticker}.png`}
               alt={`Sticker ${sticker}`}
-              className="w-24 md:w-32 lg:w-40 h-auto object-contain"
+              className="w-16 sm:w-20 md:w-24 lg:w-32 h-auto object-contain"
+              loading="eager"
               animate="float"
               custom={index}
               variants={stickerFloatVariants}
+              onError={(e) => {
+                console.error(`Failed to load sticker: /stickers/jijah-${sticker}.png`);
+                e.target.style.display = 'none';
+              }}
             />
           </motion.div>
         ))}
         
-        {/* Classic floating icons as well */}
+        {/* Classic floating icons as well - reduce size for mobile */}
         <motion.div 
           variants={floatingIconVariants}
           animate="animate"
+          custom={isMobile()}
           className="absolute top-1/4 left-1/4 text-primary-300 opacity-20"
-          style={{ fontSize: '6rem' }}
+          style={{ fontSize: isMobile() ? '3rem' : '6rem' }}
         >
           <FiAward />
         </motion.div>
         <motion.div 
           variants={floatingIconVariants}
           animate="animate"
+          custom={isMobile()}
           className="absolute top-3/4 left-1/5 text-secondary-300 opacity-20"
-          style={{ fontSize: '7rem' }}
+          style={{ fontSize: isMobile() ? '3.5rem' : '7rem' }}
         >
           <FiStar />
         </motion.div>
-        <motion.div 
-          variants={floatingIconVariants}
-          animate="animate"
-          className="absolute top-1/3 right-1/4 text-accent-300 opacity-20"
-          style={{ fontSize: '8rem' }}
-        >
-          <FiHeart />
-        </motion.div>
+        {!isMobile() && ( // Only show this icon on desktop
+          <motion.div 
+            variants={floatingIconVariants}
+            animate="animate"
+            custom={false}
+            className="absolute top-1/3 right-1/4 text-accent-300 opacity-20"
+            style={{ fontSize: '8rem' }}
+          >
+            <FiHeart />
+          </motion.div>
+        )}
       </div>
 
       <motion.div 
@@ -277,9 +323,9 @@ const Siap = () => {
             transition={{ type: "spring", stiffness: 300, damping: 15 }}
           >
             <div className="relative overflow-hidden shadow-2xl rounded-2xl transform transition-all duration-300">
-              {/* Shine effect overlay */}
+            {/* Shine effect overlay - simplified for mobile */}
               <motion.div 
-                className="absolute inset-0 w-full h-full bg-white/30 transform -skew-x-30 z-10"
+                className={`absolute inset-0 w-full h-full bg-white/30 transform -skew-x-30 z-10 ${isMobile() ? 'hidden' : ''}`}
                 animate={{ 
                   x: ['-100%', '200%'],
                 }}
@@ -294,7 +340,12 @@ const Siap = () => {
               <img 
                 src="/stickers/jijah-sempro-2.png" 
                 alt="Nur Fadiyah Seminar Proposal" 
-                className="h-64 sm:h-72 md:h-80 mx-auto object-contain"
+                className="h-48 sm:h-56 md:h-64 lg:h-72 mx-auto object-contain"
+                loading="eager"
+                onError={(e) => {
+                  console.error("Failed to load main sticker");
+                  e.target.src = "/stickers/jijah-2.png"; // Fallback
+                }}
               />
             </div>
           </motion.div>
@@ -324,7 +375,12 @@ const Siap = () => {
             >
               <div className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-gray-800 dark:to-gray-700 p-6 rounded-xl shadow-lg text-center flex-1 relative overflow-hidden h-full">
                 <div className="absolute -right-6 -bottom-6 opacity-10">
-                  <img src="/stickers/jijah-2.png" alt="" className="w-32 h-32 object-contain" />
+                  <img 
+                    src="/stickers/jijah-2.png" 
+                    alt="" 
+                    className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain"
+                    loading="eager" 
+                  />
                 </div>
                 <h3 className="text-primary-600 dark:text-primary-400 font-bold text-xl mb-2">gatau apa apa</h3>
                 <p className="text-gray-700 dark:text-gray-300">tiba tiba sempro wkwkwk</p>
@@ -338,7 +394,12 @@ const Siap = () => {
             >
               <div className="bg-gradient-to-br from-secondary-50 to-secondary-100 dark:from-gray-800 dark:to-gray-700 p-6 rounded-xl shadow-lg text-center flex-1 relative overflow-hidden h-full">
                 <div className="absolute -right-6 -bottom-6 opacity-10">
-                  <img src="/stickers/jijah-7.png" alt="" className="w-32 h-32 object-contain" />
+                  <img 
+                    src="/stickers/jijah-7.png" 
+                    alt="" 
+                    className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain"
+                    loading="eager" 
+                  />
                 </div>
                 <h3 className="text-secondary-600 dark:text-secondary-400 font-bold text-xl mb-2">Langkah Selanjutnyaaaaaaaa</h3>
                 <p className="text-gray-700 dark:text-gray-300">Seminar hasil, penyusunan skripsi, dan ujian komprehensif telah menunggumu.</p>
@@ -362,9 +423,9 @@ const Siap = () => {
               >
                 <span className="absolute inset-0 w-full h-full bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                 
-                {/* Animated shine effect */}
+                {/* Animated shine effect - simplified for mobile */}
                 <motion.div 
-                  className="absolute inset-0 w-20 h-full bg-white/20 transform -skew-x-30"
+                  className={`absolute inset-0 w-20 h-full bg-white/20 transform -skew-x-30 ${isMobile() ? 'hidden' : ''}`}
                   animate={{ 
                     x: ['-100%', '200%'],
                   }}

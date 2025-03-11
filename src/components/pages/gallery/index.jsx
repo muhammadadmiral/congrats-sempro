@@ -11,7 +11,7 @@ const Gallery = () => {
     <div className="pt-16 md:pt-20">
       <PageHeader 
         title="Photo Gallery"
-        subtitle="Capturing the memorable moments of academic achievement and celebration"
+        subtitle="futu futu"
         bgColor="from-secondary-500 to-primary-500"
       />
       
